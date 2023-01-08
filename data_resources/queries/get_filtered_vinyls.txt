@@ -1,0 +1,17 @@
+PREFIX res: <http://www.w3.org/2005/sparql-results#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?vinyl ?artist ?genre ?releaseDate
+WHERE {
+  ?result a res:ResultSet .
+  ?result res:solution ?solution . 
+  ?solution res:binding [ res:variable "vinyl" ; res:value ?vinyl ] .
+  ?solution res:binding [ res:variable "artist" ; res:value ?artist ] .
+  ?solution res:binding [ res:variable "genre" ; res:value ?genre ] .
+  ?solution res:binding [ res:variable "releaseDate" ; res:value ?releaseDate ] .
+    
+  FILTER (contains(?genre, "rock music") || 
+  contains(?artist, "Frank Aleksandersen") && 
+  ?releaseDate >= xsd:dateTime('1970-01-01'))
+}
