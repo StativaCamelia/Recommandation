@@ -21,7 +21,7 @@ public class RecommendationStardogRepo {
     private static final String url = "http://localhost:5820";
     private static final String username = "admin";
     private static final String password = "admin";
-    private static final String to = "superheroes";
+    private static final String to = "vinyl";
     private static final String NS = "http://api.stardog.com/";
     public static final String S = "PREFIX foaf:<http://xmlns.com/foaf/0.1/> " +
             "select * { ?s rdf:type foaf:Person }";
