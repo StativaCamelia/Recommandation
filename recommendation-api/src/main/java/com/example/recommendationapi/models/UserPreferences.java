@@ -9,8 +9,8 @@ public class UserPreferences {
     public List<String> likedGenres = new ArrayList<>();
     public List<String> dislikedGenres = new ArrayList<>();
     public List<DatePreference> datePerArtist = new ArrayList<>();
-    public List<Integer> likedYears = new ArrayList<>();
-    public List<Integer> dislikedYears = new ArrayList<>();
+    public Integer startYear = 0;
+    public Integer endYear = 0;
     public Integer limit = 0;
     public Integer pageSize = 5;
     public Integer pageIndex = 1;

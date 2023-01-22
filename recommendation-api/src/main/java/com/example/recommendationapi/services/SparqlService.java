@@ -40,18 +40,9 @@ public class SparqlService {
         AddGeneralPrefixes();
         AddSelectAllFields();
         AddWhereBindingsAllFields();
-
-        if (userPreferences.likedArtists.size() != 0 || userPreferences.dislikedArtists.size() != 0 ||
-                userPreferences.likedGenres.size() != 0 || userPreferences.dislikedGenres.size() != 0) {
-            queryBuilder.AddFilterInWhere();
-
-            AddFilterForLikedItems(userPreferences.likedArtists, likedGenres);
-            AddFilterForDislikedItems(userPreferences.dislikedArtists, userPreferences.dislikedGenres,
-                    userPreferences.likedArtists, userPreferences.likedGenres);
-
-            queryBuilder.CloseFilter();
-        }
-
+        AddFilters(userPreferences.dislikedArtists, userPreferences.dislikedGenres,
+                userPreferences.likedArtists, likedGenres,
+                userPreferences.startYear, userPreferences.endYear);
 
         queryBuilder.CloseWhere();
 
@@ -141,9 +132,25 @@ public class SparqlService {
 
     private void AddNotContainsLikedList(List<String> dislikedList, String entity) {
         dislikedList
-                .forEach(dislikeditem -> queryBuilder.AddNotContainsStringInFilter(entity, dislikeditem)
+                .forEach(dislikedItem -> queryBuilder.AddNotContainsStringInFilter(entity, dislikedItem)
                         .AddANDInFilter());
         this.queryBuilder.DeleteLastOperatorInFilter();
+    }
+
+    private void AddFilters(List<String> dislikedArtists, List<String> dislikedGenres,
+                            List<String> likedArtists, List<String> likedGenres,
+                            Integer startYear, Integer endYear) {
+        if (likedArtists.size() != 0 || dislikedArtists.size() != 0 ||
+                likedGenres.size() != 0 || dislikedGenres.size() != 0) {
+            queryBuilder.AddFilterInWhere();
+
+            AddFilterForLikedItems(likedArtists, likedGenres);
+            AddYearCondition(likedArtists, likedGenres, startYear, endYear);
+            AddFilterForDislikedItems(dislikedArtists, dislikedGenres,
+                    likedArtists, likedGenres);
+
+            queryBuilder.CloseFilter();
+        }
     }
 
     private void AddFilterForLikedItems(List<String> likedArtists, List<String> likedGenres) {
@@ -165,6 +172,24 @@ public class SparqlService {
 
         if (likedArtists.size() != 0 || likedGenres.size() != 0) {
             queryBuilder.CloseParanthesis();
+        }
+    }
+
+    private void AddYearCondition(List<String> likedArtists, List<String> likedGenres, Integer startYear, Integer endYear) {
+        if ((likedArtists.size() != 0 || likedGenres.size() != 0) && (startYear != 0 || endYear != 0)) {
+            queryBuilder.AddANDInFilter();
+        }
+
+        if (startYear != 0) {
+            queryBuilder.AddDateConditionInFilter(RELEASEDATE, ">=", startYear + "-01-01");
+        }
+
+        if (startYear != 0 && endYear != 0) {
+            queryBuilder.AddANDInFilter();
+        }
+
+        if (endYear != 0) {
+            queryBuilder.AddDateConditionInFilter(RELEASEDATE, "<=", endYear + "-01-01");
         }
     }
 
