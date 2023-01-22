@@ -15,17 +15,41 @@ import javax.ws.rs.core.Response;
 @Service
 public class SparqlService {
 
-    private final QueryBuilder queryBuilder;
+    private final SparqlQueryBuilder queryBuilder;
+    private final String sparqlEndpoint = "https://recommandationapi-374817.ew.r.appspot.com/recommendationSparQL";
 
     @Inject
-    public SparqlService(QueryBuilder queryBuilder) {
+    public SparqlService(SparqlQueryBuilder queryBuilder) {
         this.queryBuilder = queryBuilder;
     }
 
-    public SparqlResponse GetRecommendationWithSparql(UserPreferences userPreferences){
+    public SparqlResponse GetRecommendationWithSparql(UserPreferences userPreferences) {
         SparqlQuery query = queryBuilder.CreateQuery(userPreferences);
         Client client = ClientBuilder.newBuilder().build();
-        Response response = client.target("https://recommandationapi-374817.ew.r.appspot.com/recommendationSparQL")
+        Response response = client.target(sparqlEndpoint)
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.json(query), Response.class);
+        return response.readEntity(SparqlResponse.class);
+    }
+
+    public SparqlResponse GetTopGenres() {
+        SparqlQuery query = new SparqlQueryBuilder()
+                .AddRdfPrefix()
+                .AddSparqlResultPrefix()
+                .AddXsdPrefix()
+                .AddSelect()
+                .AddSelectedField("genre")
+                .AddSelectedCountField("vinyl", "recordsCount")
+                .AddWhere()
+                .AddBindingVariableInWhere("vinyl")
+                .AddBindingVariableInWhere("genre")
+                .CloseWhere()
+                .AddGroupBy("genre")
+                .AddOrderBy("recordsCount", false)
+                .Build();
+
+        Client client = ClientBuilder.newBuilder().build();
+        Response response = client.target(sparqlEndpoint)
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(query), Response.class);
         return response.readEntity(SparqlResponse.class);
