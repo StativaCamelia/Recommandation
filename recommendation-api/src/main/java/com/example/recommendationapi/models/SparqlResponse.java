@@ -1,19 +1,10 @@
 package com.example.recommendationapi.models;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SparqlResponse {
-    public Head head;
-    public Results results;
-
-    public class Head {
-        public List<String> vars = new ArrayList<>();
-    }
-    public class Results {
-        public List<String> bindings = new ArrayList<>();
-
-        public class Data {
-        }
-    }
+    public Map<String, List<String>> head = new HashMap<>();
+    public Map<String, List<Map<String, Map<String, String>>>> results = new HashMap<>();
 }

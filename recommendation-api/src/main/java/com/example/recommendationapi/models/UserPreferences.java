@@ -8,4 +8,5 @@ public class UserPreferences {
     public List<String> dislikedArtists = new ArrayList<>();
     public List<String> likedGenres = new ArrayList<>();
     public List<String> dislikedGenres = new ArrayList<>();
+    public Integer recommendationLimit = 0;
 }
