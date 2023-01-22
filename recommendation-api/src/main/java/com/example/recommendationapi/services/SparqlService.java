@@ -30,7 +30,6 @@ public class SparqlService {
             likedGenres.addAll(GetGenresByLikedArtists(userPreferences.likedArtists));
         }
         likedGenres.addAll(userPreferences.likedGenres);
-
         likedGenres = likedGenres.stream()
                 .distinct()
                 .collect(Collectors.toList());
