@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/recommendation")
@@ -22,8 +25,8 @@ public class RecommendationController {
     }
 
     @PostMapping("/preferences")
-    public String postBody(@RequestBody UserPreferences userPreferences) {
+    public Map<String, Map<String, List<Object>>> postBody(@RequestBody UserPreferences userPreferences) {
         Response response = sparqlService.GetRecommendationWithSparql(userPreferences);
-        return response.readEntity(String.class);
+        return response.readEntity(new GenericType<Map<String, Map<String, List<Object>>>>() {});
     }
 }

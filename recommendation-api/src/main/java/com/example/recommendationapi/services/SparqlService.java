@@ -23,7 +23,7 @@ public class SparqlService {
 
     public Response GetRecommendationWithSparql(UserPreferences userPreferences){
         SparqlQuery query = queryBuilder.CreateQuery(userPreferences);
-        Client client = ClientBuilder.newClient();
+        Client client = ClientBuilder.newBuilder().build();
         Response response = client.target("https://recommandationapi-374817.ew.r.appspot.com/recommendationSparQL")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(query), Response.class);
