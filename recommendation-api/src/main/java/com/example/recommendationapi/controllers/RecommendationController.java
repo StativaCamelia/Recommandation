@@ -30,51 +30,12 @@ public class RecommendationController {
     @PostMapping("/preferences")
     public Result getRecommendedPreferences(@RequestBody UserPreferences userPreferences) {
         SparqlResponse sparqlResponse = sparqlService.GetRecommendationWithSparql(userPreferences);
-        List<Map<String, Map<String, String>>> bindings = sparqlResponse.results.get("bindings");
-
-        List<Map<String, String>> finalList = new ArrayList<>();
-
-        for (Map<String, Map<String, String>> entity : bindings) {
-            if (finalList.size() == userPreferences.recommendationLimit &&
-                    userPreferences.recommendationLimit != 0) {
-                break;
-            }
-            Map<String, String> finalValue = new HashMap<>();
-            entity.forEach((key, value) -> {
-                finalValue.put(key, value.get("value"));
-            });
-            finalList.add(finalValue);
-        }
-
-        Result result = new Result();
-        result.variables = sparqlResponse.head.get("vars");
-        result.results = finalList;
-
-        return result;
+        return sparqlResponse.GetResult(userPreferences.recommendationLimit);
     }
 
     @PostMapping("/genres")
     public Result getTopGenre(@RequestBody TopVinylGenre topVinylGenre) {
         SparqlResponse sparqlResponse = sparqlService.GetTopGenres();
-        List<Map<String, String>> finalList = new ArrayList<>();
-
-        List<Map<String, Map<String, String>>> bindings = sparqlResponse.results.get("bindings");
-        for (Map<String, Map<String, String>> entity : bindings) {
-            if (finalList.size() == topVinylGenre.top &&
-                    topVinylGenre.top != 0) {
-                break;
-            }
-            Map<String, String> finalValue = new HashMap<>();
-            entity.forEach((key, value) -> {
-                finalValue.put(key, value.get("value"));
-            });
-            finalList.add(finalValue);
-        }
-
-        Result result = new Result();
-        result.variables = sparqlResponse.head.get("vars");
-        result.results = finalList;
-
-        return result;
+        return sparqlResponse.GetResult(topVinylGenre.top);
     }
 }

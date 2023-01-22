@@ -91,7 +91,7 @@ public class SparqlQueryBuilder {
         return this;
     }
 
-    public SparqlQueryBuilder CloseFilter(){
+    public SparqlQueryBuilder CloseFilter() {
         this.query += ")\n";
         return this;
     }
@@ -112,7 +112,7 @@ public class SparqlQueryBuilder {
         return this;
     }
 
-    public SparqlQuery Build(){
+    public SparqlQuery Build() {
         return new SparqlQuery(this.query);
     }
 }
