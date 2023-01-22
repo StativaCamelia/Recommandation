@@ -132,6 +132,11 @@ public class SparqlQueryBuilder {
         return this;
     }
 
+    public SparqlQueryBuilder AddLimit(Integer limit) {
+        this.query += "\nLIMIT " + limit;
+        return this;
+    }
+
     public SparqlQueryBuilder ResetQuery() {
         this.query = "";
         return this;

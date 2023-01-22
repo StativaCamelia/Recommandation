@@ -53,15 +53,19 @@ public class SparqlService {
         }
 
 
-        return queryBuilder
-                .CloseWhere()
-                .Build()
-                .SendRequest();
+        queryBuilder.CloseWhere();
+
+        SparqlQuery query = userPreferences.limit == 0
+                ? queryBuilder.Build()
+                : queryBuilder.AddLimit(userPreferences.limit)
+                .Build();
+
+        return query.SendRequest();
     }
 
-    public SparqlResponse GetTopByCount(String field) {
+    public SparqlResponse GetTopByCount(String field, Integer limit) {
         queryBuilder.ResetQuery();
-        SparqlQuery query = queryBuilder
+        queryBuilder
                 .AddRdfPrefix()
                 .AddSparqlResultPrefix()
                 .AddXsdPrefix()
@@ -73,7 +77,11 @@ public class SparqlService {
                 .AddBindingVariableInWhere(field)
                 .CloseWhere()
                 .AddGroupBy(field)
-                .AddOrderBy("recordsCount", false)
+                .AddOrderBy("recordsCount", false);
+
+        SparqlQuery query = limit == 0
+                ? queryBuilder.Build()
+                : queryBuilder.AddLimit(limit)
                 .Build();
 
         return query.SendRequest();
@@ -94,7 +102,7 @@ public class SparqlService {
                 .Build()
                 .SendRequest();
 
-        return sparqlResponse.GetResult(0).results
+        return sparqlResponse.GetResult(1, 0).results
                 .stream()
                 .map(entity -> entity.get(GENRE))
                 .collect(Collectors.toList());

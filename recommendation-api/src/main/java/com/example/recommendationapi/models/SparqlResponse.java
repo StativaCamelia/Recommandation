@@ -12,22 +12,27 @@ public class SparqlResponse {
     public String message;
     public String code;
 
-    public Result GetResult(Integer top) {
+    public Result GetResult(Integer pageIndex, Integer pageSize) {
         Result result = new Result();
         List<Map<String, String>> finalList = new ArrayList<>();
         List<Map<String, Map<String, String>>> bindings = this.results.get("bindings");
-        for (Map<String, Map<String, String>> entity : bindings) {
-            if (finalList.size() == top && top != 0) {
-                break;
-            }
+
+        int totalCount = bindings.size();
+        if (pageSize == 0) {
+            pageSize = totalCount;
+        }
+        pageIndex = pageIndex - 1;
+        int startIndex = pageIndex * pageSize;
+        int endIndex = Math.min((pageIndex + 1) * pageSize, totalCount);
+        for (int i = startIndex; i < endIndex; i++) {
             Map<String, String> finalValue = new HashMap<>();
-            entity.forEach((key, value) -> {
-                finalValue.put(key, value.get("value"));
-            });
+            bindings.get(i).forEach((key, value) -> finalValue.put(key, value.get("value")));
+
             finalList.add(finalValue);
         }
         result.variables = this.head.get("vars");
         result.results = finalList;
+        result.totalCount = totalCount;
 
         return result;
     }

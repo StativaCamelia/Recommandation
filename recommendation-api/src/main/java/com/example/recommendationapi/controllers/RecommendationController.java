@@ -32,12 +32,12 @@ public class RecommendationController {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "The request query is incorrect" + sparqlResponse.message);
         }
-        return sparqlResponse.GetResult(userPreferences.recommendationLimit);
+        return sparqlResponse.GetResult(userPreferences.pageIndex, userPreferences.pageSize);
     }
 
     @PostMapping("/count")
     public Result getTopByCount(@RequestBody TopVinylByCount topVinylByCount) {
-        SparqlResponse sparqlResponse = sparqlService.GetTopByCount(topVinylByCount.field);
-        return sparqlResponse.GetResult(topVinylByCount.top);
+        SparqlResponse sparqlResponse = sparqlService.GetTopByCount(topVinylByCount.field, topVinylByCount.limit);
+        return sparqlResponse.GetResult(topVinylByCount.pageIndex, topVinylByCount.pageSize);
     }
 }
