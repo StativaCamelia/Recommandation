@@ -76,6 +76,11 @@ public class SparqlQueryBuilder {
         return this;
     }
 
+    public SparqlQueryBuilder AddNotContainsStringInFilter(String field, String containedValue) {
+        this.query += "!contains(?" + field + ", \"" + containedValue + "\") ";
+        return this;
+    }
+
     public SparqlQueryBuilder AddDateConditionInFilter(String field, String operator, String date) {
         this.query += "?" + field + " " + operator + " xsd:dateTime('" + date + "')";
         return this;
@@ -86,8 +91,23 @@ public class SparqlQueryBuilder {
         return this;
     }
 
+    public SparqlQueryBuilder DeleteLastOperatorInFilter() {
+        this.query = this.query.substring(0, this.query.length() - 3);
+        return this;
+    }
+
     public SparqlQueryBuilder AddANDInFilter() {
         this.query += "&&\n";
+        return this;
+    }
+
+    public SparqlQueryBuilder AddParanthesis() {
+        this.query += "(";
+        return this;
+    }
+
+    public SparqlQueryBuilder CloseParanthesis() {
+        this.query += ")";
         return this;
     }
 
@@ -109,6 +129,11 @@ public class SparqlQueryBuilder {
     public SparqlQueryBuilder AddOrderBy(String field, boolean asc) {
         String direction = asc ? "asc" : "desc";
         this.query += "\nORDER BY " + direction + "(?" + field + ")";
+        return this;
+    }
+
+    public SparqlQueryBuilder ResetQuery() {
+        this.query = "";
         return this;
     }
 

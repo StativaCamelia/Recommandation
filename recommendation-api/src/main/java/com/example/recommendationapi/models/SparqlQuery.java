@@ -14,6 +14,7 @@ public class SparqlQuery {
     }
 
     public SparqlResponse SendRequest() {
+        System.out.println(query);
         Client client = ClientBuilder.newBuilder().build();
         String sparqlEndpoint = "https://recommandationapi-374817.ew.r.appspot.com/recommendationSparQL";
 
