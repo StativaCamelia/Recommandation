@@ -15,6 +15,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/recommendation")
+@CrossOrigin
 public class RecommendationController {
 
     private final SparqlService sparqlService;
