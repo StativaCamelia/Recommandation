@@ -14,4 +14,18 @@ public class UserPreferences {
     public Integer pageSize = 5;
     public Integer pageIndex = 1;
 
+    @Override
+    public String toString() {
+        return "UserPreferences{" +
+                "likedArtists=" + likedArtists +
+                ", dislikedArtists=" + dislikedArtists +
+                ", likedGenres=" + likedGenres +
+                ", dislikedGenres=" + dislikedGenres +
+                ", startYear=" + startYear +
+                ", endYear=" + endYear +
+                ", limit=" + limit +
+                ", pageSize=" + pageSize +
+                ", pageIndex=" + pageIndex +
+                '}';
+    }
 }

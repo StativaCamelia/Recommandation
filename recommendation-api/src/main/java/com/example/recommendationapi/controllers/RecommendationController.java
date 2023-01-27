@@ -5,14 +5,13 @@ import com.example.recommendationapi.models.SparqlResponse;
 import com.example.recommendationapi.models.TopVinylByCount;
 import com.example.recommendationapi.models.UserPreferences;
 import com.example.recommendationapi.services.SparqlService;
+import com.example.recommendationapi.services.exceptions.UserHasNoData;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.inject.Inject;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/recommendation")
@@ -40,4 +39,29 @@ public class RecommendationController {
         SparqlResponse sparqlResponse = sparqlService.GetTopByCount(topVinylByCount.field, topVinylByCount.limit);
         return sparqlResponse.GetResult(topVinylByCount.pageIndex, topVinylByCount.pageSize);
     }
+
+    @PostMapping("/discogs")
+    public Result getPreferencesFromDiscogsByUserId(@RequestBody String userId) {
+        SparqlResponse sparqlResponse = sparqlService.getRecommendationFromDiscogsByUser(userId);
+        if (sparqlResponse.isError) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "The request query is incorrect" + sparqlResponse.message);
+        }
+        return null;
+    }
+
+    @GetMapping("/discogs")
+    public Result getPreferencesFromDiscogsByDiscogsToken(@RequestParam("discogs_token") String discogsToken,
+                                                          @RequestParam("discogs_token_secret") String discogsTokenSecret, @RequestParam("page_index") Integer pageIndex, @RequestParam("page_size") Integer pageSize) throws IOException, UserHasNoData {
+
+        final SparqlResponse sparqlResponse = sparqlService.getRecommendationFromDiscogsByToken(discogsToken, discogsTokenSecret);
+
+        if (sparqlResponse.isError) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "The request query is incorrect" + sparqlResponse.message);
+        }
+        return sparqlResponse.GetResult(pageIndex, pageSize);
+    }
+
 }

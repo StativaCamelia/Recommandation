@@ -3,9 +3,11 @@ package com.example.recommendationapi.services;
 import com.example.recommendationapi.models.SparqlQuery;
 import com.example.recommendationapi.models.SparqlResponse;
 import com.example.recommendationapi.models.UserPreferences;
+import com.example.recommendationapi.services.exceptions.UserHasNoData;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,15 +15,18 @@ import java.util.stream.Collectors;
 @Service
 public class SparqlService {
 
-    private final SparqlQueryBuilder queryBuilder;
+
     private static final String VINYL = "vinyl";
     private static final String ARTIST = "artist";
     private static final String GENRE = "genre";
     private static final String RELEASEDATE = "releaseDate";
+    private final SparqlQueryBuilder queryBuilder;
+    private final DiscogsCallsService discogsCallsService;
 
     @Inject
-    public SparqlService(SparqlQueryBuilder queryBuilder) {
+    public SparqlService(SparqlQueryBuilder queryBuilder, DiscogsCallsService discogsCallsService) {
         this.queryBuilder = queryBuilder;
+        this.discogsCallsService = discogsCallsService;
     }
 
     public SparqlResponse GetRecommendationByPreferences(UserPreferences userPreferences) {
@@ -210,5 +215,38 @@ public class SparqlService {
         if (dislikedGenres.size() != 0) {
             AddNotContainsLikedList(dislikedGenres, GENRE);
         }
+    }
+
+    public SparqlResponse getRecommendationFromDiscogsByUser(String userId) {
+
+        // get discogs token from account (call user service for that)
+        // get discogs past purchases with token
+        // extract data from past purchases
+        // make query to sparQL
+        // convert data to needed format
+        return null;
+    }
+
+    public SparqlResponse getRecommendationFromDiscogsByToken(String userToken, String userTokenSecret) throws IOException, UserHasNoData {
+
+        UserPreferences userPreferences = discogsCallsService.getPastPurchases(userToken, userTokenSecret);
+        System.out.println(userPreferences);
+        queryBuilder.ResetQuery();
+
+        AddGeneralPrefixes();
+        AddSelectAllFields();
+        AddWhereBindingsAllFields();
+        AddFilters(userPreferences.dislikedArtists, userPreferences.dislikedGenres,
+                userPreferences.likedArtists, userPreferences.likedGenres,
+                userPreferences.startYear, userPreferences.endYear);
+
+        queryBuilder.CloseWhere();
+
+        SparqlQuery query = userPreferences.limit == 0
+                ? queryBuilder.Build()
+                : queryBuilder.AddLimit(userPreferences.limit)
+                .Build();
+
+        return query.SendRequest();
     }
 }
