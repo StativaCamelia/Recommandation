@@ -6,16 +6,14 @@ import com.example.recommendationapi.models.TopVinylByCount;
 import com.example.recommendationapi.models.UserPreferences;
 import com.example.recommendationapi.services.SparqlService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.inject.Inject;
 
 @RestController
 @RequestMapping("/recommendation")
+@CrossOrigin
 public class RecommendationController {
 
     private final SparqlService sparqlService;
