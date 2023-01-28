@@ -140,7 +140,8 @@ public class SparqlService {
                             List<String> likedArtists, List<String> likedGenres,
                             Integer startYear, Integer endYear) {
         if (likedArtists.size() != 0 || dislikedArtists.size() != 0 ||
-                likedGenres.size() != 0 || dislikedGenres.size() != 0) {
+                likedGenres.size() != 0 || dislikedGenres.size() != 0 ||
+                startYear != 0 || endYear != 0) {
             queryBuilder.AddFilterInWhere();
 
             AddFilterForLikedItems(likedArtists, likedGenres);
