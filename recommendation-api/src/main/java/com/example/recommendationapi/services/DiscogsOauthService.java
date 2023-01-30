@@ -10,7 +10,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 
@@ -23,6 +22,7 @@ public class DiscogsOauthService {
     private static final String ACCESS_TOKEN_URL = "https://api.discogs.com/oauth/access_token";
 
     private static final String TOKEN_URL = "https://api.discogs.com/oauth/request_token";
+    private static final String USER_API_URL = "https://user-microservice-wade.herokuapp.com/edit";
 
     private String TOKEN;
     private String TOKEN_SECRET;
@@ -73,7 +73,9 @@ public class DiscogsOauthService {
             if (response.getStatusLine().getStatusCode() == 200) {
                 String body = DiscogsCallsUtils.readInputStream(response.getEntity().getContent());
 
-                //TODO: Store the tokens in database
+                HttpPost userRequest = new HttpPost(USER_API_URL);
+                //get the token
+                accessRequest.setHeader(HttpHeaders.AUTHORIZATION, getAccessTokenHeader(verifierCode));
 
                 return parseAccessTokenBody(this.bean, body);
             } else {
