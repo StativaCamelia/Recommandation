@@ -2,17 +2,16 @@ package com.example.recommendationapi.controllers;
 
 import com.example.recommendationapi.models.OAuthDiscogsCredentials;
 import com.example.recommendationapi.services.DiscogsOauthService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 
 @RestController
 @RequestMapping("/discogs")
+@CrossOrigin
 public class DiscogsController {
 
 
@@ -37,9 +36,9 @@ public class DiscogsController {
     }
 
     @GetMapping(value = "access_token")
-    public ResponseEntity<OAuthDiscogsCredentials> getDiscogsAccessToken(@RequestParam("oauth_verifier") String verifier) throws Exception {
+    public ResponseEntity<OAuthDiscogsCredentials> getDiscogsAccessToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String auth, @RequestParam("verifier") String verifier) throws Exception {
 
-        OAuthDiscogsCredentials token = discogsOauthService.getAccessToken(verifier);
+        OAuthDiscogsCredentials token = discogsOauthService.getAccessToken(verifier, auth);
         if (token != null) {
             return new ResponseEntity<>(token, HttpStatus.OK);
         } else {

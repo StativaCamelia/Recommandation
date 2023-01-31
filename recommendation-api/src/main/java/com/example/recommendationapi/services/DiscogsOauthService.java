@@ -7,9 +7,13 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
 
@@ -44,8 +48,11 @@ public class DiscogsOauthService {
     private OAuthDiscogsCredentials parseTempTokenBody(OAuthDiscogsCredentials bean, String body) {
 
         String[] parts = body.split("&");
+        System.out.println("User Token Body" + body);
         TOKEN = parts[0].substring(parts[0].indexOf("=") + 1);
         TOKEN_SECRET = parts[1].substring(parts[1].indexOf("=") + 1);
+        System.out.println(TOKEN);
+        System.out.println(TOKEN_SECRET);
         bean.setAuthorizationUrl(AUTHENTICATION_URL + "?" + parts[0]);
 
         return bean;
@@ -62,24 +69,22 @@ public class DiscogsOauthService {
                 "oauth_callback=" + "\"http://localhost:3000/profile\"";
     }
 
-    public OAuthDiscogsCredentials getAccessToken(String verifierCode) throws Exception {
+    public OAuthDiscogsCredentials getAccessToken(String verifierCode, String auth) throws Exception {
 
         HttpPost accessRequest = new HttpPost(ACCESS_TOKEN_URL);
-
         accessRequest.setHeader(HttpHeaders.AUTHORIZATION, getAccessTokenHeader(verifierCode));
 
+        System.out.println("Access Body");
+        System.out.println(getAccessTokenHeader(verifierCode));
         try {
             HttpResponse response = HttpClients.createDefault().execute(accessRequest);
             if (response.getStatusLine().getStatusCode() == 200) {
+
                 String body = DiscogsCallsUtils.readInputStream(response.getEntity().getContent());
 
-                HttpPost userRequest = new HttpPost(USER_API_URL);
-                //get the token
-                accessRequest.setHeader(HttpHeaders.AUTHORIZATION, getAccessTokenHeader(verifierCode));
-
-                return parseAccessTokenBody(this.bean, body);
+                return parseAccessTokenBody(this.bean, body, auth);
             } else {
-
+                System.out.println("Access_Token" + response.getStatusLine());
                 return null;
             }
         } catch (Exception ex) {
@@ -89,12 +94,42 @@ public class DiscogsOauthService {
     }
 
 
-    private OAuthDiscogsCredentials parseAccessTokenBody(OAuthDiscogsCredentials bean, String body) {
+    private OAuthDiscogsCredentials parseAccessTokenBody(OAuthDiscogsCredentials bean, String body, String auth) throws IOException {
 
         String[] parts = body.split("&");
+
         bean.setUserTokenSecret(parts[1].substring(parts[1].lastIndexOf("=") + 1));
         bean.setUserToken(parts[0].substring(parts[0].lastIndexOf("=") + 1));
+
+        saveTokenData(bean, auth);
+
         return bean;
+    }
+
+    private void saveTokenData(OAuthDiscogsCredentials bean, String auth) throws IOException {
+        HttpPost userRequest = getHttpPost(bean, auth);
+
+        HttpResponse response = HttpClients.createDefault().execute(userRequest);
+
+        if (response.getStatusLine().getStatusCode() != 200)
+            System.out.println("Profile" + response.getStatusLine());
+    }
+
+    private HttpPost getHttpPost(OAuthDiscogsCredentials bean, String auth) throws UnsupportedEncodingException {
+        HttpPost userRequest = new HttpPost(USER_API_URL);
+        userRequest.setHeader(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", auth));
+        userRequest.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+        JSONObject json = getBody(bean);
+        StringEntity params = new StringEntity(json.toString());
+        userRequest.setEntity(params);
+        return userRequest;
+    }
+
+    private JSONObject getBody(OAuthDiscogsCredentials bean) {
+        JSONObject json = new JSONObject();
+        json.put("discogs_token", bean.getUserToken());
+        json.put("discogs_secret", bean.getUserTokenSecret());
+        return json;
     }
 
     private String getAccessTokenHeader(String verifier) {
