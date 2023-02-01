@@ -66,7 +66,7 @@ public class DiscogsOauthService {
                 "oauth_signature=\"" + SECRET + "&\", " +
                 "oauth_signature_method=\"" + "PLAINTEXT" + "\", " +
                 "oauth_timestamp=" + System.currentTimeMillis() / 1000 + "\", " +
-                "oauth_callback=" + "\"http://localhost:3000/profile\"";
+                "oauth_callback=" + "\"https://vire-front.herokuapp.com/profile\"";
     }
 
     public OAuthDiscogsCredentials getAccessToken(String verifierCode, String auth) throws Exception {
